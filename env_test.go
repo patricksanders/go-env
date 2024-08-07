@@ -141,12 +141,13 @@ func (j JSONData) MarshalEnvironmentValue() (string, error) {
 }
 
 type IterValuesStruct struct {
-	StringSlice   []string        `env:"STRING"`
-	IntSlice      []int           `env:"INT"`
-	Int64Slice    []int64         `env:"INT64"`
-	DurationSlice []time.Duration `env:"DURATION"`
-	BoolSlice     []bool          `env:"BOOL"`
-	KVStringSlice []string        `env:"KV"`
+	StringSlice                []string        `env:"STRING"`
+	StringSliceCustomSeparator []string        `env:"STRING_CUSTOM_SEPARATOR,separator=?"`
+	IntSlice                   []int           `env:"INT"`
+	Int64Slice                 []int64         `env:"INT64"`
+	DurationSlice              []time.Duration `env:"DURATION"`
+	BoolSlice                  []bool          `env:"BOOL"`
+	KVStringSlice              []string        `env:"KV"`
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -371,12 +372,13 @@ func TestUnmarshalUnexported(t *testing.T) {
 
 func TestUnmarshalSlice(t *testing.T) {
 	environ := map[string]string{
-		"STRING":   "separate|values",
-		"INT":      "1|2",
-		"INT64":    "3|4",
-		"DURATION": "60s|70h",
-		"BOOL":     "true|false",
-		"KV":       "k1=v1|k2=v2",
+		"STRING":                  "separate|values",
+		"STRING_CUSTOM_SEPARATOR": "one?two",
+		"INT":                     "1|2",
+		"INT64":                   "3|4",
+		"DURATION":                "60s|70h",
+		"BOOL":                    "true|false",
+		"KV":                      "k1=v1|k2=v2",
 	}
 	var iterValStruct IterValuesStruct
 	err := Unmarshal(environ, &iterValStruct)
@@ -385,6 +387,7 @@ func TestUnmarshalSlice(t *testing.T) {
 	}
 	testCases := [][]interface{}{
 		{iterValStruct.StringSlice, []string{"separate", "values"}},
+		{iterValStruct.StringSliceCustomSeparator, []string{"one", "two"}},
 		{iterValStruct.IntSlice, []int{1, 2}},
 		{iterValStruct.Int64Slice, []int64{3, 4}},
 		{iterValStruct.DurationSlice, []time.Duration{time.Second * 60, time.Hour * 70}},
